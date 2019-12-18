@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e
+
+if [[ -n "${RASTER_VISION_DEBUG}" ]]; then
+    set -x
+fi
+
+function usage() {
+    echo -n \
+         "Usage: $(basename "$0") [--cpu|--gpu]
+Build Docker image.
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]
+then
+    if [ "${1:-}" = "--help" ]
+    then
+        usage
+        exit
+    fi
+
+    if [ $# -eq 0 -o "${1:-}" = "--pytorch" ]
+    then
+        if [ -z "$RASTER_VISION_REPO" ]
+        then
+            BASE_IMAGE="quay.io/azavea/raster-vision:pytorch-latest"
+        else
+            BASE_IMAGE="raster-vision-pytorch"
+        fi
+        
+        docker build --build-arg BASE_IMAGE="$BASE_IMAGE" -t raster-vision-wb-africa -f Dockerfile .
+    fi
+fi
