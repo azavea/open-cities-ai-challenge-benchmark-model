@@ -1,11 +1,12 @@
 import json
 from functools import reduce
 from os.path import basename, dirname, join
+from random import sample
 
 import rastervision as rv
-from benchmark.experiments.constants import CLASSES, TRAIN_IDS, VALID_IDS
-from benchmark.experiments.io import my_read_method, my_write_method
-from benchmark.experiments.utils import str_to_bool
+from benchmark.constants import CLASSES, TRAIN_IDS, VALID_IDS
+from benchmark.io import my_read_method, my_write_method
+from benchmark.utils import str_to_bool
 from pystac import STAC_IO, Catalog
 from rastervision.backend.api import PYTORCH_SEMANTIC_SEGMENTATION
 from rastervision.utils.files import file_exists
@@ -15,12 +16,7 @@ STAC_IO.write_text_method = my_write_method
 
 
 class BenchmarkExperiment(rv.ExperimentSet):
-    def exp_predict(self, experiment_id,
-                    stac_uri='s3://raster-vision-world-bank-challenge/FINAL/train_tier_1/catalog.json',
-                    img_dir='s3://raster-vision-world-bank-challenge/splits/',
-                    root_uri='s3://raster-vision-world-bank-challenge/benchmark/',
-                    test=False):
-
+    def exp_benchmark(self, experiment_id, stac_uri, img_dir, root_uri, test=False):
         test = str_to_bool(test)
 
         chip_opts = {
@@ -30,7 +26,7 @@ class BenchmarkExperiment(rv.ExperimentSet):
 
         config = {
             'batch_size': 8,
-            'num_epochs': 20,
+            'num_epochs': 30,
             'debug': True,
             'lr': 1e-4,
             'one_cycle': True,
@@ -50,8 +46,7 @@ class BenchmarkExperiment(rv.ExperimentSet):
             experiment_id += '-TEST'
 
         task = rv.TaskConfig.builder(rv.SEMANTIC_SEGMENTATION) \
-                            .with_chip_size(300) \
-                            .with_predict_chip_size(300) \
+                            .with_chip_size(900) \
                             .with_classes(CLASSES) \
                             .with_chip_options(**chip_opts) \
                             .build()
@@ -92,7 +87,7 @@ class BenchmarkExperiment(rv.ExperimentSet):
 
                     scene = rv.SceneConfig.builder() \
                         .with_task(task) \
-                        .with_id(item.id) \
+                        .with_id('{}_{}'.format(item.id, i)) \
                         .with_raster_source(raster_source) \
                         .with_label_source(label_source) \
                         .build()
@@ -107,8 +102,8 @@ class BenchmarkExperiment(rv.ExperimentSet):
         train_ids = TRAIN_IDS
         valid_ids = VALID_IDS
         if test:
-            train_ids = train_ids[0:1]
-            valid_ids = valid_ids[0:1]
+            train_ids = sample(train_ids, 2)
+            valid_ids = sample(valid_ids, 2)
 
         train_scenes = reduce(
             lambda a, b: a+b, [make_scenes(cat.get_child(c).get_item(i)) for c, i in train_ids])
@@ -116,8 +111,8 @@ class BenchmarkExperiment(rv.ExperimentSet):
             lambda a, b: a+b, [make_scenes(cat.get_child(c).get_item(i)) for c, i in valid_ids])
 
         if test:
-            train_scenes = train_scenes[0:1]
-            valid_scenes = valid_scenes[0:1]
+            train_scenes = sample(train_scenes, 3)
+            valid_scenes = sample(valid_scenes, 3)
 
         dataset = rv.DatasetConfig.builder() \
             .with_train_scenes(train_scenes) \
@@ -126,7 +121,6 @@ class BenchmarkExperiment(rv.ExperimentSet):
 
         experiment = rv.ExperimentConfig.builder() \
             .with_id(experiment_id) \
-            .with_train_key(None) \
             .with_task(task) \
             .with_backend(backend) \
             .with_dataset(dataset) \
