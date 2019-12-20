@@ -46,7 +46,6 @@ class BenchmarkExperiment(rv.ExperimentSet):
             experiment_id += '-TEST'
 
         task = rv.TaskConfig.builder(rv.SEMANTIC_SEGMENTATION) \
-                            .with_chip_size(900) \
                             .with_classes(CLASSES) \
                             .with_chip_options(**chip_opts) \
                             .build()
