@@ -5,23 +5,26 @@ import numpy as np
 
 import rasterio
 import rastervision as rv
-from rastervision.utils.files import upload_or_copy
+from rastervision.utils.files import upload_or_copy, download_if_needed
 
 POSTPROCESS = 'POSTPROCESS'
 
 
-def _postprocess(uri, root_uri, experiment_id):
-    tmp_uri = uri.replace('/predict/', '/postprocess/')
-    out_uri = join(root_uri, 'postprocess', experiment_id, basename(uri))
+def _postprocess(pred_uri, experiment_id, root_uri):
+    tmp_pred_uri = download_if_needed(pred_uri, '/opt/data/predict/')
+    tmp_postprocess_uri = tmp_pred_uri.replace('/predict/', '/postprocess/')
+    out_uri = join(root_uri, 'postprocess', experiment_id, basename(pred_uri))
 
-    with rasterio.open(uri) as src:
+    with rasterio.open(tmp_pred_uri) as src:
         img = src.read()
         img = np.where(img == 2, 0, img)
         profile = src.profile
-    with rasterio.open(tmp_uri, 'w', **profile) as dst:
+    with rasterio.open(tmp_postprocess_uri, 'w', **profile) as dst:
         dst.write(img)
 
-    upload_or_copy(tmp_uri, out_uri)
+    upload_or_copy(tmp_postprocess_uri, out_uri)
+    for t in (tmp_pred_uri, tmp_postprocess_uri):
+        os.remove(t)
 
 
 class PostProcessCommand(rv.AuxCommand):

@@ -7,14 +7,17 @@ from pystac import Catalog
 
 
 class SplitImages(rv.ExperimentSet):
-    def exp_split_images(self, cat_uri, output_dir, root_uri):
+    def exp_split_images(self, root_uri, train_stac_uri, split_dir=None):
+        if not split_dir:
+            split_dir = join(root_uri, 'split_images')
+
         image_ids = TRAIN_IDS + VALID_IDS
 
-        image_uris = [join(dirname(cat_uri), area, uid,
+        image_uris = [join(dirname(train_stac_uri), area, uid,
                            '{}.tif'.format(uid)) for area, uid in image_ids]
 
         config = rv.CommandConfig.builder(PREPROCESS) \
                                  .with_root_uri(root_uri) \
-                                 .with_config(items=image_uris, output_dir=output_dir) \
+                                 .with_config(items=image_uris, split_dir=split_dir) \
                                  .build()
         return config
