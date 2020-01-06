@@ -50,7 +50,7 @@ def split_image(image_uri, split_dir):
             '-co COPY_SRC_OVERVIEWS=YES -co BLOCKXSIZE=512 -co BLOCKYSIZE=512 --config COMPRESS_OVERVIEW JPEG'
         call(gdal_command, shell=True)
         upload_or_copy(tmp_cmpr_file, output_uri)
-        for t in (tmp_uri, tmp_uri):
+        for t in (tmp_uri, tmp_cmpr_file):
             os.remove(t)
 
 

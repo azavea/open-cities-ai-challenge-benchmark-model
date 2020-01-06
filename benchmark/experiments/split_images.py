@@ -7,7 +7,11 @@ from pystac import Catalog
 
 
 class SplitImages(rv.ExperimentSet):
-    def exp_split_images(self, root_uri, train_stac_uri, split_dir=None):
+    def exp_split_images(self,
+                         root_uri,
+                         train_stac_uri='https://drivendata-competition-building-segmentation.s3-us-west-1.amazonaws.com/train_tier_1/catalog.json',
+                         split_dir=None):
+        
         if not split_dir:
             split_dir = join(root_uri, 'split_images')
 

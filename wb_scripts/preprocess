@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export ROOT_URI=s3://raster-vision-world-bank-challenge/benchmark/
+export SPLIT_DIR=s3://raster-vision-world-bank-challenge/benchmark/split_images_TEST/
+
+rastervision -p wbbenchmark run aws_batch -e benchmark.experiments.split_images \
+    PREPROCESS -a root_uri $ROOT_URI -a split_dir $SPLIT_DIR -s 8

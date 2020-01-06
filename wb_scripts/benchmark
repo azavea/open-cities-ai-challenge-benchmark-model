@@ -1,0 +1,16 @@
+#!/bin/bash
+
+export EXPERIMENT_ID=split_img_v9
+export ROOT_URI=s3://raster-vision-world-bank-challenge/benchmark/
+export TRAIN_STAC_URI=s3://drivendata-competition-building-segmentation/train_tier_1/catalog.json
+export TEST_STAC_URI=/opt/data/test/catalog.json
+export TEST_IMG_DIR=s3://drivendata-competition-building-segmentation/test/
+
+rastervision -p wbbenchmark run aws_batch -e benchmark.experiments.benchmark \
+    chip train predict eval bundle POSTPROCESS \
+    -a experiment_id $EXPERIMENT_ID \
+    -a root_uri $ROOT_URI \
+    -a train_stac_uri $TRAIN_STAC_URI \
+    -a test_stac_uri $TEST_STAC_URI \
+    -a test_img_dir $TEST_IMG_DIR \
+    -x -r -s 10

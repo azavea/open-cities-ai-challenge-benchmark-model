@@ -13,6 +13,8 @@ POSTPROCESS = 'POSTPROCESS'
 def _postprocess(pred_uri, experiment_id, root_uri):
     tmp_pred_uri = download_if_needed(pred_uri, '/opt/data/predict/')
     tmp_postprocess_uri = tmp_pred_uri.replace('/predict/', '/postprocess/')
+    
+    os.makedirs(dirname(tmp_postprocess_uri), exist_ok=True)
     out_uri = join(root_uri, 'postprocess', experiment_id, basename(pred_uri))
 
     with rasterio.open(tmp_pred_uri) as src:
@@ -44,7 +46,7 @@ class PostProcessCommand(rv.AuxCommand):
             os.makedirs(postprocess_dir)
 
         for uri in self.command_config['uris']:
-            _postprocess(uri, root_uri, experiment_id)
+            _postprocess(uri, experiment_id, root_uri)
 
     @staticmethod
     def gather_inputs(conf):
