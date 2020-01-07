@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export EXPERIMENT_ID=split_img_v9
-export ROOT_URI=s3://raster-vision-world-bank-challenge/benchmark/
+export EXPERIMENT_ID=[give your experiment an ID]
+export ROOT_URI=[experiment root uri]
 export TRAIN_STAC_URI=s3://drivendata-competition-building-segmentation/train_tier_1/catalog.json
 export TEST_STAC_URI=/opt/data/test/catalog.json
 export TEST_IMG_DIR=s3://drivendata-competition-building-segmentation/test/

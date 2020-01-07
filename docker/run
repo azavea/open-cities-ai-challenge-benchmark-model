@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# * mounts the examples directory
-# * uses the raster-vision-wb-africa Docker image
-# * mounts the main RV repo only if it's pointed to by RASTER_VISION_REPO
-# * uses $REPO_ROOT/notebooks as the notebooks dir
-
 set -e
 
 if [[ -n "${RASTER_VISION_DEBUG}" ]]; then
@@ -21,17 +16,11 @@ function usage() {
          "Usage: $(basename "$0") <options> <command>
 Run a console in the raster-vision-wb-africa Docker image locally.
 
-Environment variables:
-RASTER_VISION_DATA_DIR (directory for storing data; mounted to /opt/data)
-AWS_PROFILE (optional AWS profile)
-RASTER_VISION_REPO (optional path to main RV repo; mounted to /opt/src)
-
 Options:
 --aws forwards AWS credentials (sets AWS_PROFILE env var and mounts ~/.aws to /root/.aws)
 --tensorboard maps port 6006
 --gpu use the NVIDIA runtime and GPU image
 --name sets the name of the running container
---jupyter forwards port 8888, mounts ./notebooks to /opt/notebooks, and runs Jupyter
 --debug maps port 3007 on localhost to 3000 inside container
 --pytorch-gpu use raster-vision-wb-africa image and nvidia runtime
 
@@ -40,7 +29,6 @@ All arguments after above options are passed to 'docker run'.
 }
 
 IMAGE="raster-vision-wb-africa"
-RASTER_VISION_DATA_DIR="${RASTER_VISION_DATA_DIR:-${REPO_ROOT}/data}"
 
 # Parse options using scheme in
 # https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
@@ -67,12 +55,6 @@ do
         NAME="--name $1"
         shift
         ;;
-        --jupyter)
-        JUPYTER="-v ${REPO_ROOT}/notebooks:/opt/notebooks -p 8888:8888"
-        CMD=(jupyter notebook --ip 0.0.0.0 --port 8888 --no-browser --allow-root --notebook-dir=/opt/notebooks)
-        shift
-        -v "${REPO_ROOT}"/benchmark:/opt/src/benchmark \
-        ;;
         --debug)
         DEBUG="-p 3007:3000"
         shift
@@ -90,13 +72,6 @@ then
     CMD=(${@:1})
 fi
 
-if [ -z "$RASTER_VISION_REPO" ]
-then
-    RV_SRC_FLAGS=""
-else
-    RV_SRC_FLAGS="-v ${RASTER_VISION_REPO}/rastervision:/opt/src/rastervision"
-fi
-
 if [ "${BASH_SOURCE[0]}" = "${0}" ]
 then
     docker run ${RUNTIME} ${NAME} --rm -it \
@@ -104,7 +79,6 @@ then
         -v "${REPO_ROOT}"/benchmark:/opt/src/benchmark \
     	-v "${REPO_ROOT}"/data:/opt/data \
         -v "${REPO_ROOT}"/wb_scripts:/opt/src/wb_scripts \
-        ${TENSORBOARD} ${AWS} ${JUPYTER} ${DOCS} ${DEBUG} \
-        ${RV_SRC_FLAGS} \
+        ${TENSORBOARD} ${AWS} ${DEBUG} \
         ${IMAGE} "${CMD[@]}"
 fi

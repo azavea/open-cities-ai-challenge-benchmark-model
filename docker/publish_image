@@ -19,7 +19,7 @@ docker push \
 
 GPU_IMAGE_NAME="raster-vision-wb-africa"
 
-ECR_GPU_IMAGE="[insert ecr gpu repository name"
+ECR_GPU_IMAGE="[insert ecr gpu repository name]"
 
 docker tag ${GPU_IMAGE_NAME} \
 	${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_GPU_IMAGE}:${ECR_IMAGE_TAG}
