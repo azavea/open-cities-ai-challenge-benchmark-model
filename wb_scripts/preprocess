@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export ROOT_URI=[insert project root_uri]
+
+rastervision -p wbbenchmark run aws_batch -e benchmark.experiments.split_images \
+    PREPROCESS -a root_uri $ROOT_URI -s 8

@@ -1,0 +1,9 @@
+[AWS_BATCH]
+job_queue=[gpu job queue]
+job_definition=[gpu job definition]
+cpu_job_queue=[cpu job queue]
+cpu_job_definition=[cpu job definition]
+attempts = 1
+
+[PLUGINS]
+modules=benchmark.aux

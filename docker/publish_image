@@ -1,0 +1,27 @@
+#!/bin/bash
+
+ACCOUNT_ID=$(aws sts get-caller-identity --output text --query 'Account')
+AWS_REGION="us-east-1"
+
+aws ecr get-login --no-include-email --region ${AWS_REGION} | bash;
+
+CPU_IMAGE_NAME="raster-vision-wb-africa"
+
+ECR_CPU_IMAGE= "[insert ecr cpu repository name]"
+
+ECR_IMAGE_TAG="world-bank-challenge"
+
+docker tag ${CPU_IMAGE_NAME} \
+	${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_CPU_IMAGE}:${ECR_IMAGE_TAG}
+docker push \
+	${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_CPU_IMAGE}:${ECR_IMAGE_TAG}
+
+
+GPU_IMAGE_NAME="raster-vision-wb-africa"
+
+ECR_GPU_IMAGE="[insert ecr gpu repository name]"
+
+docker tag ${GPU_IMAGE_NAME} \
+	${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_GPU_IMAGE}:${ECR_IMAGE_TAG}
+docker push \
+	${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_GPU_IMAGE}:${ECR_IMAGE_TAG}
