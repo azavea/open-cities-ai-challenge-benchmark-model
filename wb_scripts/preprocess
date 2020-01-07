@@ -1,7 +1,6 @@
 #!/bin/bash
 
 export ROOT_URI=[insert project root_uri]
-export SPLIT_DIR=[insert directory for image splits (e.g. root_uri/split_images/)]
 
 rastervision -p wbbenchmark run aws_batch -e benchmark.experiments.split_images \
-    PREPROCESS -a root_uri $ROOT_URI -a split_dir $SPLIT_DIR -s 8
+    PREPROCESS -a root_uri $ROOT_URI -s 8
