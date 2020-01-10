@@ -91,11 +91,11 @@ class BenchmarkExperiment(rv.ExperimentSet):
         # Training configuration: try to improve performance by tuning these
         # hyperparameters
         config = {
-            'batch_size': 8,         # 8 chips per batch
-            'num_epochs': 6,         # complete 6 epochs
-            'debug': True,           # produce example chips to help with debugging
-            'lr': 1e-4,              # set learning
-            'one_cycle': True,       # use cyclic learning rate scheduler
+            'batch_size': 8,          # 8 chips per batch
+            'num_epochs': 6,          # complete 6 epochs
+            'debug': True,            # produce example chips to help with debugging
+            'lr': 1e-4,               # set learning
+            'one_cycle': True,        # use cyclic learning rate scheduler
             'model_arch': 'resnet18'  # model architecture
         }
 
