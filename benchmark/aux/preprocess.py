@@ -22,10 +22,18 @@ def split_image(image_uri, split_dir):
     for c in list(range(0, width, win_size)):
         if c >= width:
             continue
+        if (c + win_size) > width:
+            win_width = width - c - 1
+        else:
+            win_width = win_size
         for r in list(range(0, height, win_size)):
             if r >= height:
                 continue
-            wins.append(Window(c, r, win_size, win_size))
+            if (r + win_size) > height:
+                win_height = height - r - 1
+            else:
+                win_height = win_size
+            wins.append(Window(c, r, win_width, win_height))
 
     i = 0
     for win in wins:
@@ -40,8 +48,8 @@ def split_image(image_uri, split_dir):
             output_uri = join(split_dir, area, image_id,
                             '{}_{}.tif'.format(image_id, i))
             kwargs.update({
-                'height': win_size,
-                'width': win_size,
+                'height': win.height,
+                'width': win.width,
                 'transform': win_transform
             })
 
